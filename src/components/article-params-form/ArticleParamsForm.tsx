@@ -4,92 +4,70 @@ import React, { useState, useRef } from 'react';
 import clsx from 'clsx';
 import { Text } from 'src/ui/text';
 import { Select } from 'src/ui/select';
-import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 import styles from './ArticleParamsForm.module.scss';
-import { OptionType, fontFamilyOptions, fontSizeOptions, fontColors, backgroundColors, contentWidthArr, defaultArticleState } from 'src/constants/articleProps';
+import {
+	ArticleStateType,
+	fontFamilyOptions,
+	fontSizeOptions,
+	fontColors,
+	backgroundColors,
+	contentWidthArr,
+	defaultArticleState,
+} from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 
 interface ArticleParamsFormProps {
-	fontFamily: OptionType;
-	setFontFamily: (option: OptionType) => void;
-	fontSize: OptionType;
-	setFontSize: (option: OptionType) => void;
-	fontColor: OptionType;
-	setFontColor: (option: OptionType) => void;
-	backgroundColor: OptionType;
-	setBackgroundColor: (option: OptionType) => void;
-	contentWidth: OptionType;
-	setContentWidth: (option: OptionType) => void;
+	articleState: ArticleStateType;
+	setArticleState: (props: ArticleStateType) => void;
+	title: string;
 }
 
-
 export const ArticleParamsForm = ({
-	fontFamily,
-	setFontFamily,
-	fontSize,
-	setFontSize,
-	fontColor,
-	setFontColor,
-	backgroundColor,
-	setBackgroundColor,
-	contentWidth,
-	setContentWidth
+	articleState,
+	setArticleState,
+	title,
 }: ArticleParamsFormProps) => {
+	// Состояния для параметров
+	const [fontFamily, setFontFamily] = useState(articleState.fontFamilyOption);
+	const [fontSize, setFontSize] = useState(articleState.fontSizeOption);
+	const [fontColor, setFontColor] = useState(articleState.fontColor);
+	const [backgroundColor, setBackgroundColor] = useState(
+		articleState.backgroundColor
+	);
+	const [contentWidth, setContentWidth] = useState(articleState.contentWidth);
 
-	// Локальные состояния для параметров
-	const [localFontFamily, setLocalFontFamily] = useState(fontFamily);
-	const [localFontSize, setLocalFontSize] = useState(fontSize);
-	const [localFontColor, setLocalFontColor] = useState(fontColor);
-	const [localBackgroundColor, setLocalBackgroundColor] = useState(backgroundColor);
-	const [localContentWidth, setLocalContentWidth] = useState(contentWidth);
-
-
-	//Состояние сайдбара
+	//Состояние контейнера (сайдбара)
 	const [isSidebarOpen, setSidebarOpen] = useState(false);
 	const handleToggleSidebar = () => {
-		setSidebarOpen(prevState => !prevState); // Переключаем состояние
-	};
-	//Выбор фонового цвета
-	const handleBackgroundColorChange = (selectedBackgroundColor: OptionType) => {
-		setLocalBackgroundColor(selectedBackgroundColor);
-	};
-	//Выбор цвета шрифта
-	const handleFontColorChange = (selectedColorFont: OptionType) => {
-		setLocalFontColor(selectedColorFont);
-	};
-	//Выбор шрифта
-	const handleFontChange = (selectedOption: OptionType) => {
-		setLocalFontFamily(selectedOption);
-	};
-	//Выбор размера шрифта
-	const handleFontSizeChange = (selectedSizeFont: OptionType) => {
-		setLocalFontSize(selectedSizeFont); 
-	};
-	//Выбор ширины контейнера
-	const handleContentWidthChange = (selectedContentWidth: OptionType) => {
-		setLocalContentWidth(selectedContentWidth); 
+		setSidebarOpen((prevState) => !prevState); // Переключаем состояние
 	};
 
 	const handleReset = () => {
-		// Приводим состояния к значениям по умолчанию
-		setLocalBackgroundColor(defaultArticleState.backgroundColor);
-		setLocalFontColor(defaultArticleState.fontColor);
-		setLocalFontFamily(fontFamilyOptions[0]);
-		setLocalFontSize(defaultArticleState.fontSizeOption);
-		setLocalContentWidth(defaultArticleState.contentWidth);
+		// Сбрасываем локальные состояния к значениям по умолчанию
+		setArticleState(defaultArticleState),
+			setFontFamily(defaultArticleState.fontFamilyOption);
+		setFontSize(defaultArticleState.fontSizeOption);
+		setFontColor(defaultArticleState.fontColor);
+		setBackgroundColor(defaultArticleState.backgroundColor);
+		setContentWidth(defaultArticleState.contentWidth);
+		handleToggleSidebar();
 	};
 
 	const handleApply = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-		// Применяем состояния
-		setBackgroundColor(localBackgroundColor);
-		setFontColor(localFontColor);
-		setFontFamily(localFontFamily);
-		setFontSize(localFontSize);
-		setContentWidth(localContentWidth);
-
+		// Применяем локальные состояния к родительским состояниям
+		setArticleState({
+			...articleState,
+			fontFamilyOption: fontFamily,
+			fontSizeOption: fontSize,
+			fontColor: fontColor,
+			backgroundColor: backgroundColor,
+			contentWidth: contentWidth,
+		});
 		handleToggleSidebar();
 	};
+
 	const ref = useRef<HTMLDivElement | null>(null);
 
 	useOutsideClickClose({
@@ -100,9 +78,7 @@ export const ArticleParamsForm = ({
 
 	return (
 		<div ref={ref}>
-			<ArrowButton
-				isOpen={isSidebarOpen}
-				onClick={handleToggleSidebar} />
+			<ArrowButton isOpen={isSidebarOpen} onClick={handleToggleSidebar} />
 			<aside
 				className={clsx(styles.container, {
 					[styles.container_open]: isSidebarOpen,
@@ -111,40 +87,39 @@ export const ArticleParamsForm = ({
 					className={styles.form}
 					onSubmit={handleApply}
 					onReset={handleReset}>
-					<Text
-						size={31}
-						uppercase
-						weight={800}>Задайте параметры</Text>
+					<Text size={31} uppercase weight={800}>
+						{title}
+					</Text>
 					<Select
 						options={fontFamilyOptions}
 						selected={fontFamily}
-						onChange={handleFontChange}
-						title="Шрифт"
+						onChange={setFontFamily}
+						title='Шрифт'
 					/>
 					<RadioGroup
 						options={fontSizeOptions}
 						selected={fontSize}
 						title='Размер шрифта'
 						name='fontSize'
-						onChange={handleFontSizeChange}
+						onChange={setFontSize}
 					/>
 					<Select
 						options={fontColors}
 						selected={fontColor}
-						onChange={handleFontColorChange}
-						title="Цвет шрифта"
+						onChange={setFontColor}
+						title='Цвет шрифта'
 					/>
 					<Select
 						options={backgroundColors}
 						selected={backgroundColor}
-						onChange={handleBackgroundColorChange}
-						title="Цвет фона"
+						onChange={setBackgroundColor}
+						title='Цвет фона'
 					/>
 					<Select
 						options={contentWidthArr}
 						selected={contentWidth}
-						onChange={handleContentWidthChange}
-						title="Ширина контена"
+						onChange={setContentWidth}
+						title='Ширина контена'
 					/>
 					<div className={styles.bottomContainer}>
 						<Button title='Сбросить' htmlType='reset' type='clear' />
