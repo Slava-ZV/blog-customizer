@@ -1,5 +1,3 @@
-import clsx from 'clsx';
-
 // Сообщаем вебпаку, что этот файл использует это изображение.
 import plane from 'src/images/plane.png';
 import { Text } from 'src/ui/text';
@@ -8,7 +6,7 @@ import styles from './Article.module.scss';
 
 export const Article = () => {
 	return (
-		<article className={clsx(styles.article)}>
+		<article className={styles.article}>
 			<Text as='h1' size={45} weight={800} uppercase dynamicLite>
 				Портрет Западной Швейцарии
 			</Text>
@@ -17,7 +15,7 @@ export const Article = () => {
 					Примитивист Фиштр расписывает новый бюджетный авиалайнер
 				</Text>
 			</div>
-			<img className={styles.image} src={plane} alt='Картинка самолета' />
+			<img className={styles.image} src={plane} alt='Изображение самолета' />
 			<Text dynamic size={18} fontStyle='italic'>
 				Фото: Hans-Peter Gauster , &quot;Bombardier CSeries CS300 HB-JCA&quot; ©
 				2017 CC BY-SA 2.0
