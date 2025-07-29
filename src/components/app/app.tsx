@@ -22,7 +22,7 @@ export const App = () => {
 			<ArticleParamsForm
 				articleState={articleState}
 				setArticleState={setArticleState}
-				title={'Выберете параметры'}
+				title={'Задайте параметры'}
 			/>
 			<Article />
 		</main>
